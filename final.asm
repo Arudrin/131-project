@@ -12,8 +12,18 @@ SET_CURSOR macro X,Y
   INT 10H
 endm
 
-MARK_BOARD macro X, Y, Z
-local SET_HIT_P1
+MARK_BOARD macro X, Y, Z  ; X - A string that represents a certain row of the guessboard of player 2 Y - A string that represents
+; a certain row of the real board of player 1. Z is the coordinate (called torpedo) to be attacked/marked.
+
+; This macro puts 'x' or 'H' to the guessboard of player 2. It puts 'x' if no ship has been hit, if there is: 'H' is put. 
+
+; This macro uses Z( the torpedo/coordinate, ex. A1, B7, etc...) and gets its number component which represents the column to be marked.
+; Now that we know which column to mark, we check in the realboard of player 1 if it is a coordinate of a ship, represented by 'o'.
+; If it is, 'H' is moved to the same column but in the guessboard of player2.
+; If it is an 'x' instead of an 'o' then the macro ends since it means that the guessboard has already been marked before. It also means 
+; that the same torpedo/coordinate has been more than once.
+; If it is empty then it puts 'x' to the guessboard of player 2, indicating that player 2 has missed the ship/s of player 1
+local SET_HIT_P1		
 local end_hit_p1
 
   LEA SI, Z
@@ -173,60 +183,60 @@ endm
 
   COLUMNS DB 0AH, 0DH, "    1   2   3   4   5   6   7$"
 
-  UPPERBORDER DB 0AH, 0DH, "  здддбдддбдддбдддбдддбдддбддд©$" 		;UPPER EDGE BORDER
+  UPPERBORDER DB 0AH, 0DH, "  ц ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└б©$" 		;UPPER EDGE BORDER
   
-  LOWERBORDER DB 0AH, 0DH, "  юдддадддадддадддадддадддаддды$"		;LOWER EDGE BORDER
+  LOWERBORDER DB 0AH, 0DH, "  ц─ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц≥$"		;LOWER EDGE BORDER
 	
-  INTERNALBORDER DB 0AH, 0DH, "  цдддедддедддедддедддедддеддд╢$"	; INTERNAL BORDER
+  INTERNALBORDER DB 0AH, 0DH, "  ц┐ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└б╢$"	; INTERNAL BORDER
 
   GUESSBOARD DB  "  YOUR GUESSBOARD$"
   YOURBOARD DB  "  YOUR BOARD$"
 
 
-  P1_GUESSBOARD_ROW_A DB 0AH, 0DH, "A Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_GUESSBOARD_ROW_B DB 0AH, 0DH, "B Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_GUESSBOARD_ROW_C DB 0AH, 0DH, "C Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_GUESSBOARD_ROW_D DB 0AH, 0DH, "D Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_GUESSBOARD_ROW_E DB 0AH, 0DH, "E Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_GUESSBOARD_ROW_F DB 0AH, 0DH, "F Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_GUESSBOARD_ROW_G DB 0AH, 0DH, "G Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
+  P1_GUESSBOARD_ROW_A DB 0AH, 0DH, "A бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_GUESSBOARD_ROW_B DB 0AH, 0DH, "B бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_GUESSBOARD_ROW_C DB 0AH, 0DH, "C бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_GUESSBOARD_ROW_D DB 0AH, 0DH, "D бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_GUESSBOARD_ROW_E DB 0AH, 0DH, "E бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_GUESSBOARD_ROW_F DB 0AH, 0DH, "F бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_GUESSBOARD_ROW_G DB 0AH, 0DH, "G бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
 
-  P1_REALBOARD_ROW_A DB 0AH, 0DH, "A Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_REALBOARD_ROW_B DB 0AH, 0DH, "B Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_REALBOARD_ROW_C DB 0AH, 0DH, "C Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_REALBOARD_ROW_D DB 0AH, 0DH, "D Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_REALBOARD_ROW_E DB 0AH, 0DH, "E Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_REALBOARD_ROW_F DB 0AH, 0DH, "F Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P1_REALBOARD_ROW_G DB 0AH, 0DH, "G Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
+  P1_REALBOARD_ROW_A DB 0AH, 0DH, "A бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_REALBOARD_ROW_B DB 0AH, 0DH, "B бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_REALBOARD_ROW_C DB 0AH, 0DH, "C бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_REALBOARD_ROW_D DB 0AH, 0DH, "D бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_REALBOARD_ROW_E DB 0AH, 0DH, "E бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_REALBOARD_ROW_F DB 0AH, 0DH, "F бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P1_REALBOARD_ROW_G DB 0AH, 0DH, "G бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
 
 
 ;------------------------------------------------------------
   COLUMNS2 DB  "    1   2   3   4   5   6   7$"
 
-  UPPERBORDER2 DB  "  здддбдддбдддбдддбдддбдддбддд©$" 		;UPPER EDGE BORDER
+  UPPERBORDER2 DB  "  ц ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└ц┌ц└ц└ц└б©$" 		;UPPER EDGE BORDER
   
-  LOWERBORDER2 DB  "  юдддадддадддадддадддадддаддды$"		;LOWER EDGE BORDER
+  LOWERBORDER2 DB  "  ц─ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц│ц└ц└ц└ц≥$"		;LOWER EDGE BORDER
 	
-  INTERNALBORDER2 DB  "  цдддедддедддедддедддедддеддд╢$"	; INTERNAL BORDER
+  INTERNALBORDER2 DB  "  ц┐ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└ц┘ц└ц└ц└б╢$"	; INTERNAL BORDER
 
   GUESSBOARD2 DB  "  YOUR GUESSBOARD$"
   YOURBOARD2 DB  "  YOUR BOARD$"
 
-  P2_GUESSBOARD_ROW_A DB  "A Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_GUESSBOARD_ROW_B DB  "B Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_GUESSBOARD_ROW_C DB  "C Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_GUESSBOARD_ROW_D DB  "D Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_GUESSBOARD_ROW_E DB  "E Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_GUESSBOARD_ROW_F DB  "F Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_GUESSBOARD_ROW_G DB  "G Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
+  P2_GUESSBOARD_ROW_A DB  "A бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_GUESSBOARD_ROW_B DB  "B бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_GUESSBOARD_ROW_C DB  "C бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_GUESSBOARD_ROW_D DB  "D бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_GUESSBOARD_ROW_E DB  "E бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_GUESSBOARD_ROW_F DB  "F бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_GUESSBOARD_ROW_G DB  "G бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
 
-  P2_REALBOARD_ROW_A DB  "A Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_REALBOARD_ROW_B DB  "B Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_REALBOARD_ROW_C DB  "C Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_REALBOARD_ROW_D DB  "D Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_REALBOARD_ROW_E DB  "E Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_REALBOARD_ROW_F DB  "F Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
-  P2_REALBOARD_ROW_G DB  "G Ё   Ё   Ё   Ё   Ё   Ё   Ё   Ё$"
+  P2_REALBOARD_ROW_A DB  "A бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_REALBOARD_ROW_B DB  "B бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_REALBOARD_ROW_C DB  "C бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_REALBOARD_ROW_D DB  "D бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_REALBOARD_ROW_E DB  "E бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_REALBOARD_ROW_F DB  "F бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
+  P2_REALBOARD_ROW_G DB  "G бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ   бЁ$"
 
 
 
